@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "outDir": "lib",
+    "sourceMap": false,
+    "strict": true,
+    "resolveJsonModule": true,
+    "downlevelIteration": true,
+    "target": "es6"
+  },
+  "include": ["src/**/*"]
+}

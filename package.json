@@ -1,0 +1,51 @@
+{
+  "name": "starname-stats",
+  "version": "1.0.0",
+  "description": "Starname statistics system",
+  "scripts": {
+    "unmodified": "git ls-files --modified >&2 && git ls-files --modified | wc --lines | { read lines ; test $lines -eq 0 ; }",
+    "start": "yarn generate-types && env-cmd -f .env.local yarn --cwd application/ start",
+    "emulate": "yarn build:functions && firebase emulators:start --project starname-stats --inspect-functions",
+    "install:functions": "yarn --ignore-engines --cwd functions/ install",
+    "install:application": "yarn --cwd application/ install",
+    "install:all": "yarn install && yarn install:application && yarn install:functions",
+    "build:functions": "env-cmd yarn --cwd functions/ build",
+    "build:application": "env-cmd yarn --cwd application/ build",
+    "build": "yarn generate-types && yarn build:application && yarn build:functions",
+    "deploy:devel": "yarn set-variant:devel && env-cmd firebase deploy --project starname-manager-devel",
+    "deploy:production": "yarn unmodified && yarn set-variant:production && env-cmd firebase deploy --project starname-manager-prod --message $(git rev-parse HEAD)",
+    "deploy:staging": "yarn unmodified && yarn set-variant:staging && env-cmd firebase deploy --project starname-manager-staging --message $(git rev-parse HEAD)",
+    "start-emulator": "yarn emulate & echo $! > emulate.pid",
+    "test:application": "env-cmd -f .env yarn --cwd application/ test",
+    "test:functions": "env-cmd -f .env yarn --cwd functions/ test",
+    "test": "yarn test:application",
+    "stop-emulator": "kill -9 $(cat emulate.pid) && rm emulate.pid",
+    "lint:functions": "eslint -c functions/.eslintrc.js --max-warnings 0 'functions/src/**/*.ts{,x}'",
+    "lint-fix:functions": "eslint -c functions/.eslintrc.js 'functions/src/**/*.ts{,x}' --fix",
+    "lint:application": "eslint -c application/.eslintrc.js --max-warnings 0 'application/src/**/*.ts{,x}'",
+    "lint-fix:application": "eslint -c application/.eslintrc.js 'application/src/**/*.ts{,x}' --fix",
+    "lint": "yarn lint:functions && yarn lint:application",
+    "lint-fix": "yarn lint-fix:functions && yarn lint-fix:application",
+    "format": "prettier --write --loglevel warn './src/**/*.{ts,tsx,json,md,css}'",
+    "generate-tx-types:application": "cd proto && ../node_modules/protoc/protoc/bin/protoc --proto_path=. --proto_path=./third-party --ts_proto_opt=esModuleInterop=true --plugin=../node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=../application/src/proto tx.proto",
+    "generate-query-types:application": "cd proto && ../node_modules/protoc/protoc/bin/protoc --proto_path=. --proto_path=./third-party --ts_proto_opt=esModuleInterop=true --plugin=../node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=../application/src/proto query.proto",
+    "generate-tx-types:functions": "cd proto && ../node_modules/protoc/protoc/bin/protoc --proto_path=. --proto_path=./third-party --ts_proto_opt=esModuleInterop=true --plugin=../node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=../functions/src/proto tx.proto",
+    "generate-query-types:functions": "cd proto && ../node_modules/protoc/protoc/bin/protoc --proto_path=. --proto_path=./third-party --ts_proto_opt=esModuleInterop=true --plugin=../node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=../functions/src/proto query.proto",
+    "generate-types": "mkdirp application/src/proto && mkdirp functions/src/proto && yarn generate-tx-types:application && yarn generate-query-types:application && yarn generate-tx-types:functions && yarn generate-query-types:functions"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iov-one/starname-stats.git"
+  },
+  "author": "IOV",
+  "license": "ISC",
+  "homepage": "https://github.com/iov-one/starname-stats#readme",
+  "devDependencies": {
+    "env-cmd": "^10.1.0"
+  },
+  "dependencies": {
+    "@date-io/moment": "^2.11.0",
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0"
+  }
+}

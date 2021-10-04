@@ -1,3 +1,4 @@
 functions/lib/
 node_modules/
 .idea/
+*.log
